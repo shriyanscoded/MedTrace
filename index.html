@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BillSanjivani 🛡️ - AI Fraud Detector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0f1e;
+            --card-bg: #1a2035;
+            --blue: #3b82f6;
+            --red: #ef4444;
+            --green: #22c55e;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Glowing orb effect */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(10, 15, 30, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 2rem;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header h1 {
+            font-size: 60px;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        header h2 {
+            color: var(--blue);
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 3rem;
+        }
+
+        .upload-box {
+            background-color: var(--card-bg);
+            border: 2px dashed var(--blue);
+            border-radius: 16px;
+            padding: 4rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            animation: glowBorder 3s infinite alternate;
+        }
+
+        .upload-box:hover {
+            background-color: rgba(26, 32, 53, 0.8);
+            transform: scale(1.02);
+        }
+
+        @keyframes glowBorder {
+            from { box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+            to { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        #preview-container {
+            display: none;
+            margin-top: 2rem;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        #image-preview {
+            max-height: 200px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        #filename {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .analyze-btn {
+            background-color: var(--blue);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+        }
+
+        #loading-steps {
+            display: none;
+            margin-top: 2rem;
+            text-align: left;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 16px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.5s ease;
+        }
+
+        .step.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+            display: none;
+        }
+
+        .step.loading .spinner {
+            display: inline-block;
+        }
+
+        .step.done .spinner {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #error-box {
+            display: none;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--red);
+            color: var(--red);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 40px; }
+            header h2 { font-size: 18px; }
+            .upload-box { padding: 2rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BillSanjivani 🛡️</h1>
+            <h2>AI-Powered Hospital Bill Fraud Detector</h2>
+            <p>Protecting Indians from hospital overcharging</p>
+        </header>
+
+        <div class="upload-box" id="drop-zone" onclick="document.getElementById('file-input').click()">
+            <div class="upload-icon">📤</div>
+            <div class="upload-text">Drop your hospital bill photo here</div>
+            <div class="upload-subtext">Supports JPG, PNG</div>
+            <input type="file" id="file-input" accept="image/jpeg, image/png">
+        </div>
+
+        <div id="preview-container">
+            <img id="image-preview" src="" alt="Bill Preview">
+            <p id="filename"></p>
+            <button class="analyze-btn" id="analyze-btn">Analyze Bill 🔍</button>
+        </div>
+
+        <div id="loading-steps">
+            <div class="step" id="step1">
+                <div class="spinner"></div>
+                <span>📄 Reading your bill with Gemini Vision...</span>
+            </div>
+            <div class="step" id="step2">
+                <div class="spinner"></div>
+                <span>🔍 Researching market prices...</span>
+            </div>
+            <div class="step" id="step3">
+                <div class="spinner"></div>
+                <span>⚖️ Generating fraud report...</span>
+            </div>
+        </div>
+
+        <div id="error-box"></div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const filenameDisplay = document.getElementById('filename');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const errorBox = document.getElementById('error-box');
+        const loadingSteps = document.getElementById('loading-steps');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+
+        let selectedFile = null;
+
+        // Drag and Drop Handlers
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.style.backgroundColor = 'rgba(26, 32, 53, 0.8)';
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.style.backgroundColor = 'var(--card-bg)';
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                selectedFile = files[0];
+                if (!selectedFile.type.match('image.*')) {
+                    showError("Please upload an image file (JPG or PNG).");
+                    return;
+                }
+                
+                errorBox.style.display = 'none';
+                filenameDisplay.textContent = selectedFile.name;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    dropZone.style.display = 'none';
+                    previewContainer.style.display = 'flex';
+                }
+                reader.readAsDataURL(selectedFile);
+            }
+        }
+
+        function showError(msg) {
+            errorBox.textContent = msg;
+            errorBox.style.display = 'block';
+        }
+
+        async function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        analyzeBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            // UI Changes
+            analyzeBtn.style.display = 'none';
+            errorBox.style.display = 'none';
+            loadingSteps.style.display = 'block';
+
+            // Fake progress animation while actual request happens
+            step1.classList.add('active', 'loading');
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                // To keep the UI animations running, we don't await the fetch immediately,
+                // or we use Promise.all to ensure AT LEAST 6 seconds pass for the animations.
+                
+                const apiPromise = fetch('http://localhost:8000/api/analyze-bill', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                await sleep(2000); // Minimum 2s for Step 1
+                step1.classList.remove('loading');
+                step1.classList.add('done');
+                step1.innerHTML = '<span>✅ Reading your bill with Gemini Vision...</span>';
+                
+                step2.classList.add('active', 'loading');
+                await sleep(2000); // Minimum 2s for Step 2
+                step2.classList.remove('loading');
+                step2.classList.add('done');
+                step2.innerHTML = '<span>✅ Researching market prices...</span>';
+                
+                step3.classList.add('active', 'loading');
+                
+                const response = await apiPromise;
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Analysis failed.');
+                }
+
+                await sleep(2000); // Just holding on step 3 for a bit
+                step3.classList.remove('loading');
+                step3.classList.add('done');
+                step3.innerHTML = '<span>✅ Generating fraud report...</span>';
+
+                localStorage.setItem("billResult", JSON.stringify(data));
+                window.location.href = "results.html";
+
+            } catch (err) {
+                step3.classList.remove('loading');
+                showError("Error: " + err.message);
+                analyzeBtn.style.display = 'block'; // Allow retry
+            }
+        });
+    </script>
+</body>
+</html>
