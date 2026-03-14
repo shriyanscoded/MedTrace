@@ -119,7 +119,7 @@ Ensures 100% accurate overcharge figures.
 
 ### Step 1: Clone Repository
 ```bash
-git clone https://github.com/yourusername/medtrace.git
+git clone https://github.com/shriyanscoded/Medtrace.git
 cd medtrace
 ```
 
