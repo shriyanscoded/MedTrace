@@ -7,17 +7,14 @@
 ![Groq](https://img.shields.io/badge/LLM-Groq%20llama--3.3--70b-8b5cf6?style=flat-square)
 ![Serper](https://img.shields.io/badge/Search-Serper%20API-42bbba?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
-![Hackathon](https://img.shields.io/badge/IIT%20Bombay-Hack%20%26%20Break%202026-red?style=flat-square)
+
 ![Theme](https://img.shields.io/badge/Theme-Agentic%20AI-blueviolet?style=flat-square)
 
 <p align="center">
   <strong>"We don't just read your bill. We investigate it."</strong>
 </p>
 
-<p align="center">
-  Built for the Hack & Break: Generative AI & Cybersecurity 
-  Innovation Challenge — IIT Bombay 2026
-</p>
+
 
 ---
 
