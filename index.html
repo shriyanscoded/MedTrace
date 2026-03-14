@@ -2,402 +2,2343 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BillSanjivani 🛡️ - AI Fraud Detector</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>MedTrace - Verify Your Hospital Bill</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
     <style>
+        /* CSS Variables */
         :root {
-            --bg-color: #0a0f1e;
-            --card-bg: #1a2035;
-            --blue: #3b82f6;
-            --red: #ef4444;
-            --green: #22c55e;
-            --text-main: #ffffff;
-            --text-muted: #9ca3af;
+            --bg-body: #F8FAFC;
+            --bg-white: #FFFFFF;
+            --text-dark: #334155;
+            --text-base: #475569;
+            --text-muted: #64748B;
+            --brand-blue: #42bbba;
+            --brand-blue-hover: #42bbba;
+            --brand-blue-light: #e0f5f5;
+            --status-green: #10B981;
+            --status-red: #EF4444;
+            --border-color: #E2E8F0;
+            --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.02);
+            --radius-xl: 16px;
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --radius-pill: 9999px;
+            
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
         }
-        
+
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            font-family: var(--font-body);
+            color: var(--text-base);
+            background-color: var(--bg-body);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            position: relative;
         }
 
-        /* Glowing orb effect */
-        body::before {
-            content: '';
-            position: absolute;
-            top: -20%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(10, 15, 30, 0) 70%);
-            z-index: -1;
-            pointer-events: none;
+        h1, h2, h3, h4, .font-heading {
+            font-family: var(--font-heading);
+            color: var(--text-dark);
+            line-height: 1.2;
         }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
 
         .container {
-            width: 100%;
-            max-width: 800px;
-            padding: 2rem;
-            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Fade-up Animation Utilities */
+        .fade-up {
             opacity: 0;
-            animation: fadeIn 0.8s ease-out forwards;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+
+        /* 1. Navigation Bar */
+        .navbar {
+            position: fixed;
+            top: 0; width: 100%;
+            z-index: 1000;
+            background: transparent;
+            transition: background 0.3s, backdrop-filter 0.3s, border-bottom 0.3s;
+            padding: 1.25rem 0;
+        }
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        header h1 {
-            font-size: 60px;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
+        .logo .med { color: var(--text-dark); }
+        .logo .trace { color: var(--brand-blue); }
 
-        header h2 {
-            color: var(--blue);
-            font-size: 24px;
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        .nav-links a {
             font-weight: 500;
-            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            transition: color 0.2s;
         }
+        .nav-links a:hover { color: var(--brand-blue); }
 
-        header p {
-            color: var(--text-muted);
-            font-size: 16px;
-            margin-bottom: 3rem;
-        }
-
-        .upload-box {
-            background-color: var(--card-bg);
-            border: 2px dashed var(--blue);
-            border-radius: 16px;
-            padding: 4rem 2rem;
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-pill);
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: border-color 0.2s;
+            color: var(--text-dark);
+            font-family: var(--font-body);
+        }
+        .lang-btn:hover { border-color: var(--brand-blue); }
+
+        /* 2. Hero Section */
+        #hero-section {
+            padding-top: 8rem;
+            padding-bottom: 6rem;
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-left { max-width: 540px; }
+
+        .trust-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--brand-blue-light);
+            color: var(--brand-blue);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            letter-spacing: -1px;
+            margin-bottom: 1.25rem;
+        }
+        .hero-title span { color: var(--brand-blue); }
+
+        .hero-desc {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+        }
+
+        .hero-ctas {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .btn-primary {
+            background: var(--brand-blue);
+            color: white;
+            border: none;
+            padding: 1.125rem 2rem;
+            border-radius: var(--radius-pill);
+            font-family: var(--font-heading);
+            font-size: 1.125rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:hover {
+            background: var(--brand-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .beta-card {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        .beta-icon {
+            font-size: 1.5rem;
+        }
+        .beta-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .beta-text strong {
+            font-family: var(--font-heading);
+            color: var(--text-dark);
+            font-size: 0.875rem;
+        }
+        .beta-text span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Right Column: Upload Tool */
+        .upload-wrapper {
+            background: var(--bg-white);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .dropzone {
+            border: 2px dashed #CBD5E1;
+            border-radius: var(--radius-lg);
+            padding: 3rem 2rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg-body);
+            cursor: pointer;
+            transition: all 0.2s;
             position: relative;
-            animation: glowBorder 3s infinite alternate;
+        }
+        .dropzone:hover {
+            border-color: var(--brand-blue);
+            background: var(--brand-blue-light);
         }
 
-        .upload-box:hover {
-            background-color: rgba(26, 32, 53, 0.8);
-            transform: scale(1.02);
-        }
-
-        @keyframes glowBorder {
-            from { box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
-            to { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+        .dropzone input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer;
         }
 
         .upload-icon {
-            font-size: 48px;
-            margin-bottom: 1rem;
+            width: 48px;
+            height: 48px;
+            background: white;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            margin: 0 auto 1rem auto;
+            box-shadow: var(--shadow-sm);
+            font-size: 1.5rem;
         }
 
-        .upload-text {
-            font-size: 20px;
-            font-weight: 500;
+        .upload-title {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            color: var(--text-dark);
             margin-bottom: 0.5rem;
         }
-
-        .upload-subtext {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        input[type="file"] {
-            display: none;
-        }
-
-        #preview-container {
-            display: none;
-            margin-top: 2rem;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        #image-preview {
-            max-height: 200px;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        #filename {
+        .upload-subtitle {
+            font-size: 0.875rem;
             color: var(--text-muted);
             margin-bottom: 1.5rem;
         }
 
-        .analyze-btn {
-            background-color: var(--blue);
-            color: white;
-            border: none;
-            padding: 1rem 3rem;
-            font-size: 18px;
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-pill);
             font-weight: 600;
-            border-radius: 50px;
+            color: var(--text-dark);
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-            transition: all 0.3s ease;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            border-color: var(--text-dark);
         }
 
-        .analyze-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.8);
+        .encryption-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 1.5rem;
         }
 
-        #loading-steps {
-            display: none;
-            margin-top: 2rem;
-            text-align: left;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
+        .upload-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
-
-        .step {
+        .option-card {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-card:hover {
+            background: white;
+            border-color: var(--brand-blue);
+        }
+
+        /* 3. Data & Problem Section — Glass Effect */
+        #data-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #0B0F19 0%, #111827 50%, #0F172A 100%);
+            border-top: none;
+            position: relative;
+            overflow: hidden;
+        }
+        #data-section::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(37, 99, 235, 0.12) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        #data-section .section-title {
+            color: #f1f5f9;
+        }
+        #data-section .section-header p {
+            color: #94A3B8 !important;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        .section-title {
+            font-size: 2.5rem;
             margin-bottom: 1rem;
-            font-size: 16px;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .data-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-xl);
+            padding: 3rem 2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .data-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, #42bbba, #6366F1, #8B5CF6);
             opacity: 0;
-            transform: translateX(-10px);
-            transition: all 0.5s ease;
+            transition: opacity 0.4s ease;
         }
-
-        .step.active {
+        .data-card:nth-child(1)::before {
+            background: linear-gradient(90deg, #42bbba, #42bbba);
             opacity: 1;
-            transform: translateX(0);
+        }
+        .data-card:nth-child(2)::before {
+            background: linear-gradient(90deg, #6366F1, #A78BFA);
+            opacity: 1;
+        }
+        .data-card:nth-child(3)::before {
+            background: linear-gradient(90deg, #8B5CF6, #EC4899);
+            opacity: 1;
+        }
+        .data-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(99, 102, 241, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .data-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
+            pointer-events: none;
+            border-radius: inherit;
         }
 
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: var(--blue);
+        .data-number {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #E0E7FF;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+        .data-card:nth-child(1) .data-number { color: #42bbba; }
+        .data-card:nth-child(2) .data-number { color: #A78BFA; }
+        .data-card:nth-child(3) .data-number { color: #F472B6; }
+
+        .data-label {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+        }
+        .data-desc {
+            font-size: 0.875rem;
+            color: #94A3B8;
+            line-height: 1.6;
+        }
+
+        /* 4. Data Privacy Section */
+        #privacy-section {
+            padding: 6rem 0;
+            background: var(--bg-body);
+        }
+
+        .privacy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .privacy-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .check-icon {
+            width: 24px; height: 24px;
+            background: #D1FAE5;
+            color: var(--status-green);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 15px;
+            display: flex; justify-content: center; align-items: center;
+            flex-shrink: 0;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        .privacy-list h4 {
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+        .privacy-list p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .cert-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .cert-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .cert-card .icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        .cert-card .name {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1rem;
+        }
+
+        /* 5. Dark Footer */
+        footer {
+            background: #0B0F19;
+            color: #94A3B8;
+            padding: 5rem 0 2rem 0;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .footer-brand .logo { margin-bottom: 1.5rem; display: block; }
+        .footer-brand .logo .med { color: white; }
+        .footer-brand p {
+            font-size: 0.875rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            max-width: 280px;
+        }
+        .social-links {
+            display: flex; gap: 1rem;
+        }
+        .social-links a {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            color: white;
+            transition: background 0.2s;
+        }
+        .social-links a:hover { background: var(--brand-blue); }
+
+        .footer-col h4 {
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .footer-col ul li { margin-bottom: 0.75rem; }
+        .footer-col a {
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        .footer-col a:hover { color: white; }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+        }
+
+        /* 5. Results Section (Hidden initially) */
+        #results-section {
             display: none;
+            padding: 8rem 0 4rem 0;
+            background: var(--bg-body);
         }
 
-        .step.loading .spinner {
-            display: inline-block;
+        .metric-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
+        .metric-card {
+            background-color: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .metric-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+        .metric-value {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            font-weight: 800;
+        }
+        .metric-card:nth-child(1) .metric-title { color: var(--text-muted); }
+        .metric-card:nth-child(1) .metric-value { color: var(--text-dark); }
+        .metric-card:nth-child(2) .metric-title { color: var(--text-muted); }
+        .metric-card:nth-child(2) .metric-value { color: var(--status-green); }
+        .metric-card:nth-child(3) .metric-title { color: var(--text-muted); }
+        .metric-card:nth-child(3) .metric-value { color: var(--status-red); }
 
-        .step.done .spinner {
+        .results-table {
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th {
+            background: var(--bg-body);
+            padding: 1rem 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+        td {
+            padding: 1.25rem 1.5rem;
+            font-size: 0.95rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-pill);
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .badge.red { background: #FEE2E2; color: var(--status-red); }
+        .badge.green { background: #D1FAE5; color: var(--status-green); }
+
+        /* Spinner for Button */
+        .spinner {
             display: none;
+            width: 20px; height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        #error-box {
+        /* Camera Modal */
+        .camera-modal {
             display: none;
-            background-color: rgba(239, 68, 68, 0.1);
-            border: 1px solid var(--red);
-            color: var(--red);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 2rem;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+        }
+        .camera-modal.active { display: flex; }
+
+        .camera-modal-content {
+            background: #111827;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 560px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
         }
 
-        @media (max-width: 600px) {
-            header h1 { font-size: 40px; }
-            header h2 { font-size: 18px; }
-            .upload-box { padding: 2rem 1rem; }
+        .camera-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .camera-header h3 {
+            color: #f1f5f9;
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        .camera-close-btn {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            color: #94A3B8;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .camera-close-btn:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .camera-viewfinder {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #000;
+            overflow: hidden;
+        }
+        .camera-viewfinder video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .captured-preview {
+            position: absolute;
+            inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #94A3B8;
+            gap: 0.75rem;
+        }
+        .camera-placeholder-icon {
+            font-size: 3rem;
+            opacity: 0.5;
+        }
+        .camera-placeholder p {
+            font-size: 0.9rem;
+        }
+        .camera-placeholder.hidden { display: none; }
+
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .camera-capture-btn {
+            width: 68px; height: 68px;
+            border-radius: 50%;
+            background: transparent;
+            border: 4px solid white;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        .camera-capture-btn:disabled {
+            border-color: #4B5563;
+            cursor: not-allowed;
+        }
+        .camera-capture-btn:not(:disabled):hover {
+            transform: scale(1.08);
+        }
+        .camera-capture-btn:not(:disabled):active {
+            transform: scale(0.95);
+        }
+        .capture-ring {
+            width: 52px; height: 52px;
+            background: white;
+            border-radius: 50%;
+            display: block;
+            transition: background 0.15s;
+        }
+        .camera-capture-btn:disabled .capture-ring {
+            background: #4B5563;
+        }
+
+        .camera-retake-btn, .camera-use-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-pill);
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .camera-retake-btn {
+            background: rgba(255,255,255,0.1);
+            color: #f1f5f9;
+        }
+        .camera-retake-btn:hover { background: rgba(255,255,255,0.18); }
+        .camera-use-btn {
+            background: var(--brand-blue);
+            color: white;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+        .camera-use-btn:hover {
+            background: var(--brand-blue-hover);
+            transform: translateY(-2px);
+        }
+
+        .camera-hint {
+            text-align: center;
+            color: #64748B;
+            font-size: 0.8rem;
+            padding: 0 1.5rem 1.25rem;
+            margin: 0;
+        }
+
+        /* ===== HOW IT WORKS SECTION ===== */
+        #howItWorksSection { padding: 5rem 0; background: var(--bg-body); }
+        .hiw-pill { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--brand-blue-light); color: var(--brand-blue); padding: 0.5rem 1.25rem; border-radius: var(--radius-pill); font-weight: 600; font-size: 0.875rem; margin-bottom: 1.25rem; }
+        .hiw-title { font-size: 2.5rem; letter-spacing: -0.5px; margin-bottom: 1rem; text-align: center; }
+        .hiw-subtitle { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 3.5rem; text-align: center; line-height: 1.7; }
+
+        /* Glass Cards - Uiverse.io style */
+        .glass-card {
+            position: relative; width: 180px; height: 220px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 25px 25px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2);
+            display: flex; justify-content: center; align-items: center;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            border-radius: 16px; margin: 0 -35px;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            transform: rotate(calc(var(--r) * 1deg));
+            cursor: pointer; z-index: 1;
+        }
+        .glass-card:hover { z-index: 10; }
+        .glass-cards-container:hover .glass-card { transform: rotate(0deg); margin: 0 8px; }
+        .glass-card::before {
+            content: ''; position: absolute; bottom: 0; width: 100%; height: 44px;
+            background: rgba(255,255,255,0.08); border-top: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0 0 16px 16px; display: flex; justify-content: center; align-items: center;
+        }
+        .glass-card::after {
+            content: attr(data-text); position: absolute; bottom: 0; width: 100%; height: 44px;
+            display: flex; justify-content: center; align-items: center;
+            color: rgba(255,255,255,0.9); font-size: 12px; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .glass-card-inner {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 10px; padding: 16px 16px 50px 16px; text-align: center;
+        }
+        .glass-icon { font-size: 36px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2)); transition: transform 0.3s ease; }
+        .glass-card:hover .glass-icon { transform: scale(1.15) translateY(-4px); }
+        .glass-title { color: white; font-size: 15px; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+        .glass-desc { color: rgba(255,255,255,0.75); font-size: 12px; line-height: 1.5; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .glass-arrow {
+            color: rgba(255,255,255,0.4); font-size: 24px; z-index: 20;
+            transition: all 0.5s ease; margin: 0 -10px; position: relative;
+        }
+        .glass-cards-container:hover .glass-arrow { opacity: 0; margin: 0 -20px; }
+        #howItWorksSteps {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            border-radius: 24px; padding: 50px 30px; margin: 30px 0; position: relative; overflow: hidden;
+        }
+        #howItWorksSteps::before {
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 400px; height: 200px;
+            background: radial-gradient(ellipse, rgba(124,58,237,0.3) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .glass-card .step-number {
+            position: absolute; top: -12px; left: -12px; width: 28px; height: 28px;
+            background: linear-gradient(135deg, #7c3aed, #42bbba); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 12px; font-weight: 800;
+            box-shadow: 0 4px 12px rgba(124,58,237,0.4); z-index: 5;
+        }
+
+        .features-header { text-align: center; margin-bottom: 2.5rem; }
+        .features-header h3 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+        .features-header p { color: var(--text-muted); font-size: 1rem; }
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 5rem; }
+        .feature-card { background: var(--bg-white); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 1.75rem; transition: transform 0.3s, box-shadow 0.3s; cursor: default; }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
+        .feature-icon-circle { width: 48px; height: 48px; border-radius: 50%; background: var(--brand-blue-light); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem; }
+        .feature-card h4 { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem; }
+        .feature-card p { font-size: 0.875rem; color: var(--text-muted); line-height: 1.7; }
+
+        /* AI Showcase */
+        .ai-showcase { background: linear-gradient(135deg, #0B0F19, #111827, #0F172A); border-radius: var(--radius-xl); padding: 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; margin-bottom: 5rem; overflow: hidden; position: relative; }
+        .ai-showcase::before { content:''; position:absolute; top:-50%; right:-30%; width:80%; height:200%; background:radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 60%); pointer-events:none; }
+        .ai-left .hiw-pill { margin-bottom: 1.5rem; }
+        .ai-left h3 { font-size: 2rem; color: #f1f5f9; line-height: 1.3; margin-bottom: 1.5rem; }
+        .ai-checks { list-style: none; padding: 0; }
+        .ai-checks li { display: flex; align-items: center; gap: 0.75rem; color: #CBD5E1; font-size: 0.95rem; margin-bottom: 0.75rem; }
+        .ai-checks li span:first-child { color: var(--status-green); font-weight: 700; }
+        .mock-chat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-xl); padding: 1.5rem; max-height: 420px; overflow-y: auto; position: relative; z-index: 1; }
+        .mock-msg { display: flex; gap: 0.625rem; margin-bottom: 1rem; }
+        .mock-msg.user { flex-direction: row-reverse; }
+        .mock-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
+        .mock-msg.ai .mock-avatar { background: rgba(124,58,237,0.3); }
+        .mock-msg.user .mock-avatar { background: rgba(255,255,255,0.15); }
+        .mock-bubble { padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.8rem; line-height: 1.6; max-width: 85%; }
+        .mock-msg.ai .mock-bubble { background: rgba(255,255,255,0.08); color: #e2e8f0; border-top-left-radius: 2px; }
+        .mock-msg.user .mock-bubble { background: var(--brand-blue); color: white; border-top-right-radius: 2px; }
+        .mock-time { font-size: 0.625rem; color: #64748B; margin-top: 0.25rem; }
+        .mock-msg.user .mock-time { text-align: right; }
+        .typing-dots { display: inline-flex; gap: 4px; padding: 0.75rem 1rem; background: rgba(255,255,255,0.08); border-radius: 12px; border-top-left-radius: 2px; }
+        .typing-dots span { width: 6px; height: 6px; background: #94A3B8; border-radius: 50%; animation: typingBounce 1.4s infinite; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-4px)} }
+
+        /* Stats Bar */
+        .stats-bar { background: linear-gradient(135deg, #0B0F19, #111827); border-radius: var(--radius-xl); padding: 3rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; text-align: center; }
+        .stat-item .stat-value { font-family: var(--font-heading); font-size: 2rem; font-weight: 800; color: #E0E7FF; margin-bottom: 0.25rem; }
+        .stat-item .stat-label { font-size: 0.8rem; color: #94A3B8; }
+
+        /* ===== MODALS ===== */
+        .modal-overlay { display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); justify-content:center; align-items:center; }
+        .modal-overlay.active { display:flex; }
+        .modal-card { background:white; border-radius:20px; max-width:700px; width:92%; max-height:85vh; overflow-y:auto; box-shadow:0 25px 60px rgba(0,0,0,0.25); position:relative; animation:modalIn 0.3s ease; }
+        @keyframes modalIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        .modal-close { position:absolute; top:1rem; right:1rem; background:var(--bg-body); border:none; width:36px; height:36px; border-radius:50%; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-muted); transition:all 0.2s; z-index:2; }
+        .modal-close:hover { background:var(--border-color); color:var(--text-dark); }
+        .modal-body { padding: 2.5rem; }
+        .modal-title { font-family:var(--font-heading); font-size:1.5rem; font-weight:700; margin-bottom:0.5rem; }
+        .modal-subtitle { color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem; }
+
+        /* Market Rates Modal */
+        .rates-search { width:100%; padding:0.75rem 1rem; border:1px solid var(--border-color); border-radius:var(--radius-md); font-size:0.875rem; font-family:var(--font-body); outline:none; transition:border-color 0.2s; margin-bottom:1rem; }
+        .rates-search:focus { border-color:var(--brand-blue); }
+        .rate-tabs { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+        .tab-btn { padding:0.4rem 1rem; border-radius:var(--radius-pill); border:1px solid var(--border-color); background:white; font-size:0.75rem; font-weight:600; cursor:pointer; font-family:var(--font-body); transition:all 0.2s; }
+        .tab-btn.active, .tab-btn:hover { background:var(--brand-blue); color:white; border-color:var(--brand-blue); }
+        .rates-table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+        .rates-table th { padding:0.75rem; background:var(--bg-body); font-size:0.7rem; text-transform:uppercase; color:var(--text-muted); font-weight:600; text-align:left; border-bottom:1px solid var(--border-color); }
+        .rates-table td { padding:0.625rem 0.75rem; border-bottom:1px solid var(--border-color); }
+        .rates-table tr:nth-child(even) { background:#f8fafc; }
+        .rates-table .price-green { color:#16a34a; font-weight:700; }
+        .rates-table .price-orange { color:#f97316; font-weight:600; }
+        .rates-table .price-blue { color:var(--brand-blue); font-weight:600; font-size:0.75rem; }
+        .rates-source { text-align:center; color:var(--text-muted); font-size:0.75rem; margin-top:1.5rem; }
+        .rates-tip { background:var(--brand-blue-light); border:1px solid rgba(37,99,235,0.2); border-radius:var(--radius-md); padding:1rem; font-size:0.8rem; color:var(--brand-blue); margin-top:1rem; line-height:1.6; }
+
+        /* Support Modal */
+        .support-card { max-width:400px; }
+        .support-option { display:flex; align-items:start; gap:1rem; padding:1rem; border:1px solid var(--border-color); border-radius:var(--radius-lg); cursor:pointer; transition:all 0.2s; margin-bottom:0.75rem; }
+        .support-option:hover { border-color:var(--brand-blue); background:var(--brand-blue-light); }
+        .support-option-icon { font-size:1.5rem; flex-shrink:0; }
+        .support-option h4 { font-size:0.95rem; margin-bottom:0.15rem; }
+        .support-option p { font-size:0.8rem; color:var(--text-muted); }
+
+        /* Beta Modal */
+        .beta-modal-card { max-width:460px; padding:2.5rem; text-align:center; }
+        .beta-modal-card .modal-title { font-size:1.35rem; }
+        .beta-count-pill { display:inline-flex; align-items:center; gap:0.4rem; background:var(--brand-blue-light); color:var(--brand-blue); padding:0.4rem 1rem; border-radius:var(--radius-pill); font-weight:600; font-size:0.8rem; margin:1rem 0 1.5rem; }
+        .beta-email { width:100%; padding:0.875rem 1rem; border:1px solid var(--border-color); border-radius:var(--radius-md); font-size:0.95rem; font-family:var(--font-body); outline:none; margin-bottom:0.75rem; transition:border-color 0.2s; }
+        .beta-email:focus { border-color:var(--brand-blue); }
+        .beta-submit { width:100%; padding:1rem; background:linear-gradient(135deg, #42bbba, #42bbba); color:white; border:none; border-radius:var(--radius-pill); font-family:var(--font-heading); font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 14px rgba(37,99,235,0.3); }
+        .beta-submit:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(37,99,235,0.4); }
+
+        /* Language Dropdown */
+        .lang-dropdown { position:relative; }
+        .lang-menu { display:none; position:absolute; top:100%; right:0; margin-top:0.5rem; background:white; border:1px solid var(--border-color); border-radius:var(--radius-lg); box-shadow:0 10px 30px rgba(0,0,0,0.12); overflow:hidden; z-index:100; min-width:140px; }
+        .lang-menu.show { display:block; }
+        .lang-option { padding:0.625rem 1rem; font-size:0.875rem; font-weight:500; cursor:pointer; transition:background 0.15s; display:block; width:100%; text-align:left; border:none; background:none; font-family:var(--font-body); color:var(--text-dark); }
+        .lang-option:hover { background:var(--brand-blue-light); color:var(--brand-blue); }
+
+        /* Toast */
+        @keyframes slideUp { from{opacity:0;transform:translateX(-50%) translateY(20px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+        /* FAQ Modal */
+        .faq-item { border-bottom:1px solid var(--border-color); padding:1rem 0; }
+        .faq-q { font-weight:700; font-size:0.95rem; color:var(--text-dark); margin-bottom:0.4rem; cursor:pointer; }
+        .faq-a { font-size:0.85rem; color:var(--text-muted); line-height:1.7; }
+
+        /* ===== RESPONSIVE STYLES ===== */
+
+        /* Large screens */
+        @media (min-width: 1025px) {
+            .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        }
+
+        /* Laptops */
+        @media (max-width: 1024px) {
+            .hero-title { font-size: 2.75rem; }
+            .hero-grid { gap: 2rem; }
+            .data-grid { gap: 1.5rem; }
+            .section-title { font-size: 2rem; }
+            .footer-grid { grid-template-columns: 2fr 1fr 1fr; gap: 2rem; }
+        }
+
+        /* Tablets */
+        @media (max-width: 768px) {
+            .container { padding: 0 1.25rem; }
+
+            .nav-links { display: none; }
+
+            .hero-grid, .privacy-grid { grid-template-columns: 1fr; }
+            .hero-left { max-width: 100%; }
+            .hero-title { font-size: 2.25rem; }
+            .hero-desc { font-size: 1rem; }
+            #hero-section { padding-top: 6rem; padding-bottom: 4rem; }
+
+            .upload-wrapper { padding: 1.5rem; }
+            .dropzone { padding: 2rem 1.25rem; }
+            .upload-options { grid-template-columns: 1fr !important; }
+
+            .data-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .data-card { padding: 2rem 1.5rem; }
+            .data-number { font-size: 2.75rem; }
+            .section-title { font-size: 1.75rem; }
+            .section-header { margin-bottom: 2.5rem; }
+
+            .cert-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+            .privacy-list h4 { font-size: 1rem; }
+
+            .metric-cards { grid-template-columns: 1fr; }
+
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+            .footer-brand { grid-column: span 2; }
+            .footer-bottom { flex-direction: column; gap: 0.75rem; text-align: center; }
+
+            .camera-modal-content { width: 96%; border-radius: 16px; }
+
+            .glass-card { width: 140px; height: 180px; margin: 0 -25px; }
+            .glass-arrow { font-size: 18px; }
+            .features-grid { grid-template-columns: 1fr 1fr; }
+            .ai-showcase { grid-template-columns: 1fr; padding: 2.5rem 1.5rem; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .hiw-title { font-size: 2rem; }
+            .modal-body { padding: 1.5rem; }
+        }
+
+        /* Mobile phones */
+        @media (max-width: 480px) {
+            .container { padding: 0 1rem; }
+
+            .logo { font-size: 1.25rem; }
+            .navbar { padding: 1rem 0; }
+
+            #hero-section { padding-top: 5rem; padding-bottom: 3rem; }
+            .hero-title { font-size: 1.85rem; letter-spacing: -0.5px; }
+            .hero-desc { font-size: 0.9rem; margin-bottom: 1.5rem; }
+            .hero-ctas { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .btn-primary { width: 100%; text-align: center; padding: 1rem 1.5rem; font-size: 1rem; }
+            .trust-badge { font-size: 0.75rem; padding: 0.4rem 0.75rem; }
+
+            .upload-wrapper { padding: 1.25rem; }
+            .dropzone { padding: 1.5rem 1rem; }
+            .upload-title { font-size: 1.1rem; }
+            .upload-subtitle { font-size: 0.8rem; }
+            .option-card { font-size: 0.9rem; padding: 0.75rem; }
+
+            .data-number { font-size: 2.25rem; }
+            .data-card { padding: 1.5rem 1.25rem; }
+            .data-label { font-size: 1rem; }
+            .data-desc { font-size: 0.8rem; }
+            .section-title { font-size: 1.5rem; }
+            #data-section { padding: 4rem 0; }
+            #privacy-section { padding: 4rem 0; }
+
+            .cert-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+            .cert-card { padding: 1.25rem; }
+            .cert-card .icon { font-size: 1.5rem; }
+            .cert-card .name { font-size: 0.85rem; }
+
+            .footer-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            .footer-brand { grid-column: span 1; }
+            footer { padding: 3rem 0 1.5rem 0; }
+
+            .metric-card { padding: 1.25rem; }
+            .metric-value { font-size: 2rem; }
+
+            .camera-modal-content { width: 100%; border-radius: 12px 12px 0 0; }
+            .camera-viewfinder { aspect-ratio: 3/4; }
+
+            .glass-cards-container { flex-wrap: wrap !important; gap: 16px !important; }
+            .glass-card { width: 140px; height: 170px; margin: 0 !important; transform: rotate(0deg) !important; }
+            .glass-arrow { display: none; }
+            .features-grid { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: 1fr 1fr; gap: 1.25rem; padding: 2rem 1.5rem; }
+            .stat-item .stat-value { font-size: 1.5rem; }
+            .ai-showcase { padding: 2rem 1.25rem; }
+            .ai-left h3 { font-size: 1.5rem; }
+            .hiw-title { font-size: 1.75rem; }
+            .modal-card { width: 96%; border-radius: 16px; }
+            .modal-body { padding: 1.25rem; }
+        }
+
+        /* Touch improvements for mobile */
+        @media (hover: none) {
+            button { -webkit-tap-highlight-color: transparent; }
+            .btn-primary:active { opacity: 0.9; transform: scale(0.98); }
+            .btn-outline:active { border-color: var(--brand-blue); background: var(--brand-blue-light); }
+            .option-card:active { background: white; border-color: var(--brand-blue); }
+            .data-card:active { transform: translateY(-4px); }
+        }
+
+        /* Print styles */
+        @media print {
+            .navbar { display: none; }
+            footer { display: none; }
+            #hero-section { padding-top: 2rem; }
+            .upload-wrapper { box-shadow: none; border: 1px solid #e2e8f0; }
+            .data-card { box-shadow: none; border: 1px solid #e2e8f0; }
+            body { background: white; }
+            @page { margin: 20px; }
+        }
+
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+
+        /* Better tap targets on mobile */
+        button, a { min-height: 36px; }
+
+        /* Prevent horizontal scroll */
+        body { overflow-x: hidden; }
+
+        /* Upload Card Animation */
+        #uploadCard {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: 
+                max-height 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.4s ease,
+                transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(-20px);
+        }
+
+        #uploadCard.open {
+            max-height: 600px;
+            opacity: 1;
+            transform: translateY(0);
+            overflow: visible; /* to allow tooltips if any */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>BillSanjivani 🛡️</h1>
-            <h2>AI-Powered Hospital Bill Fraud Detector</h2>
-            <p>Protecting Indians from hospital overcharging</p>
-        </header>
 
-        <div class="upload-box" id="drop-zone" onclick="document.getElementById('file-input').click()">
-            <div class="upload-icon">📤</div>
-            <div class="upload-text">Drop your hospital bill photo here</div>
-            <div class="upload-subtext">Supports JPG, PNG</div>
-            <input type="file" id="file-input" accept="image/jpeg, image/png">
-        </div>
-
-        <div id="preview-container">
-            <img id="image-preview" src="" alt="Bill Preview">
-            <p id="filename"></p>
-            <button class="analyze-btn" id="analyze-btn">Analyze Bill 🔍</button>
-        </div>
-
-        <div id="loading-steps">
-            <div class="step" id="step1">
-                <div class="spinner"></div>
-                <span>📄 Reading your bill with Gemini Vision...</span>
-            </div>
-            <div class="step" id="step2">
-                <div class="spinner"></div>
-                <span>🔍 Researching market prices...</span>
-            </div>
-            <div class="step" id="step3">
-                <div class="spinner"></div>
-                <span>⚖️ Generating fraud report...</span>
+    <!-- 1. Navigation Bar -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-content">
+            <a href="#" class="logo">
+                <span class="med">Med</span><span class="trace">Trace</span>
+            </a>
+            <div class="nav-links">
+                <a href="#howItWorksSection" onclick="event.preventDefault();document.getElementById('howItWorksSection').scrollIntoView({behavior:'smooth'})">How it works</a>
+                <a href="#" onclick="event.preventDefault();openMarketRates()">Market Rates</a>
+                <a href="#" onclick="event.preventDefault();openSupport()">Support</a>
+                <div class="lang-dropdown">
+                    <button class="lang-btn" onclick="toggleLangMenu()">🌐 <span id="currentLang">English</span> ▾</button>
+                    <div class="lang-menu" id="langMenu">
+                        <button class="lang-option" onclick="switchLang('en')">🇬🇧 English</button>
+                        <button class="lang-option" onclick="switchLang('hi')">🇮🇳 हिन्दी</button>
+                        <button class="lang-option" onclick="switchLang('ta')">🇮🇳 தமிழ்</button>
+                    </div>
+                </div>
             </div>
         </div>
+    </nav>
 
-        <div id="error-box"></div>
+    <!-- 2. Hero Section -->
+    <section id="hero-section">
+        <div class="container hero-grid fade-up">
+            <div class="hero-left">
+                <div class="trust-badge">
+                    <span>🛡️ Verified across 12,000+ Indian hospitals</span>
+                </div>
+                <h1 class="hero-title">Protecting Your <span>Health</span> & Your <span>Wallet</span></h1>
+                <p class="hero-desc">Upload your medical bill to instantly detect fraud, find fair market prices, and see exactly where you were overcharged.</p>
+                
+                <div class="hero-ctas">
+                    <button id="scanBtn" class="btn-primary" onclick="openUploadCard()">Start Scanning</button>
+                    <div class="beta-card" style="cursor:pointer" onclick="openBetaModal()">
+                        <div class="beta-icon">✨</div>
+                        <div class="beta-text">
+                            <strong>Join the Beta</strong>
+                            <span>Helping us improve and refine</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-right">
+                <div id="uploadCard">
+                    <div class="upload-wrapper">
+                        <div style="height:3px;background:linear-gradient(90deg, #42bbba, #7c3aed);border-radius:4px 4px 0 0;margin-bottom:20px;"></div>
+                        <form id="upload-form" onsubmit="event.preventDefault()">
+                            <div class="dropzone" id="drop-zone" onclick="document.getElementById('fileInput').click()">
+                            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+                            <div class="upload-icon">📄</div>
+                            <h3 class="upload-title" id="uploadLabel">Upload Hospital Bill</h3>
+                            <p class="upload-subtitle" id="uploadSubLabel">Supports JPG, PNG, PDF</p>
+                            <button type="button" class="btn-outline" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">Browse Files</button>
+                        </div>
+                        <div id="fileName" style="display:none; margin-top:0.75rem; color:var(--brand-blue); font-weight:600; font-size:0.875rem;"></div>
+                        <div class="encryption-badge">🔒 End-to-end encrypted</div>
+                        <button type="button" id="analyzeBtn" class="btn-primary" onclick="analyzeBill()" style="width:100%; margin-top:1rem; display:none;">
+                            Analyze Bill →
+                        </button>
+                    </form>
+
+                    <!-- Progress Steps (hidden initially) -->
+                    <div id="progressOverlay" style="display:none; margin-top:1.5rem;">
+                        <div class="step" style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; color:var(--text-muted); font-size:0.875rem; font-weight:500;">
+                            <span>⏳</span> Step 1: Extracting text from image...
+                        </div>
+                        <div class="step pending" style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; color:var(--text-muted); font-size:0.875rem; font-weight:500;">
+                            <span>⏳</span> Step 2: Searching market prices...
+                        </div>
+                        <div class="step pending" style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem; color:var(--text-muted); font-size:0.875rem; font-weight:500;">
+                            <span>⏳</span> Step 3: Generating fraud analysis...
+                        </div>
+                    </div>
+
+                    <!-- Error toast -->
+                    <div id="errorToast" style="display:none; margin-top:1rem; padding:0.75rem 1rem; background:#FEE2E2; color:#DC2626; border-radius:var(--radius-md); font-size:0.875rem; font-weight:500;"></div>
+
+                    <div class="upload-options" style="grid-template-columns: 1fr;">
+                        <div class="option-card" onclick="openCamera()">
+                            <span style="font-size: 1.25rem;">📷</span> Take Photo with Camera
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Camera Modal -->
+    <div id="cameraModal" class="camera-modal">
+        <div class="camera-modal-content">
+            <div class="camera-header">
+                <h3>📷 Capture Bill Photo</h3>
+                <button class="camera-close-btn" onclick="closeCamera()">✕</button>
+            </div>
+            <div class="camera-viewfinder">
+                <video id="cameraVideo" autoplay playsinline></video>
+                <canvas id="cameraCanvas" style="display:none;"></canvas>
+                <div id="cameraPlaceholder" class="camera-placeholder">
+                    <div class="camera-placeholder-icon">📷</div>
+                    <p>Requesting camera permission...</p>
+                </div>
+                <img id="capturedPreview" class="captured-preview" style="display:none;" alt="Captured photo">
+            </div>
+            <div class="camera-controls">
+                <button id="captureBtn" class="camera-capture-btn" onclick="capturePhoto()" disabled>
+                    <span class="capture-ring"></span>
+                </button>
+                <button id="retakeBtn" class="camera-retake-btn" onclick="retakePhoto()" style="display:none;">🔄 Retake</button>
+                <button id="usePhotoBtn" class="camera-use-btn" onclick="usePhoto()" style="display:none;">✅ Use This Photo</button>
+            </div>
+            <p class="camera-hint" id="cameraHint">Position your bill within the frame and tap capture</p>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <section id="howItWorksSection">
+        <div class="container">
+            <!-- Part A: Header -->
+            <div style="text-align:center" class="animate-on-scroll">
+                <div class="hiw-pill">✨ Powered by Agentic AI</div>
+                <h2 class="hiw-title">Everything you need to<br>fight billing fraud</h2>
+                <p class="hiw-subtitle">MedTrace uses a chain of AI agents working together to protect you from hospital overcharging</p>
+            </div>
+
+            <!-- Part B: 4 Steps - Glass Cards -->
+            <div id="howItWorksSteps" class="animate-on-scroll">
+                <div class="glass-cards-container" style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:0;padding:40px 20px;position:relative;">
+                    <!-- Step 1 -->
+                    <div class="glass-card" data-text="Upload" style="--r:-15;">
+                        <div class="step-number">1</div>
+                        <div class="glass-card-inner">
+                            <div class="glass-icon">📸</div>
+                            <div class="glass-title">Upload Bill</div>
+                            <div class="glass-desc">Take a photo or upload your hospital bill image</div>
+                        </div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="glass-arrow">→</div>
+                    <!-- Step 2 -->
+                    <div class="glass-card" data-text="AI Reads" style="--r:-5;">
+                        <div class="step-number">2</div>
+                        <div class="glass-card-inner">
+                            <div class="glass-icon">🤖</div>
+                            <div class="glass-title">AI Reads Bill</div>
+                            <div class="glass-desc">Gemini Vision scans every line item with accuracy</div>
+                        </div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="glass-arrow">→</div>
+                    <!-- Step 3 -->
+                    <div class="glass-card" data-text="Research" style="--r:5;">
+                        <div class="step-number">3</div>
+                        <div class="glass-card-inner">
+                            <div class="glass-icon">🔍</div>
+                            <div class="glass-title">Price Research</div>
+                            <div class="glass-desc">Agent searches CGHS rates and IRDAI price caps</div>
+                        </div>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="glass-arrow">→</div>
+                    <!-- Step 4 -->
+                    <div class="glass-card" data-text="Report" style="--r:15;">
+                        <div class="step-number">4</div>
+                        <div class="glass-card-inner">
+                            <div class="glass-icon">⚖️</div>
+                            <div class="glass-title">Fraud Report</div>
+                            <div class="glass-desc">Get exact overcharge amounts and dispute guide</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part C: Features Grid -->
+            <div class="features-header animate-on-scroll">
+                <h3>What makes MedTrace different</h3>
+                <p>Built specifically for Indian patients</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon-circle">📊</div>
+                    <h4>Fair Price Ranges</h4>
+                    <p>We show price ranges not single prices because costs vary by city and hospital type. More honest, more accurate.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon-circle">📍</div>
+                    <h4>Location-Aware Pricing</h4>
+                    <p>Tell our AI your city and get prices specific to Mumbai, rural UP, Chennai or anywhere in India.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon-circle">💬</div>
+                    <h4>AI Chat Assistant</h4>
+                    <p>Ask anything about your bill in English or Hindi. Our AI explains every charge and tells you how to dispute it.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon-circle">🏛️</div>
+                    <h4>CGHS & IRDAI Rates</h4>
+                    <p>Powered by government approved price benchmarks. The same rates used by Central Government employees.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon-circle">🔒</div>
+                    <h4>100% Private</h4>
+                    <p>Your bill is never stored on our servers. Processed and deleted instantly. Complete privacy guaranteed.</p>
+                </div>
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon-circle">⚡</div>
+                    <h4>Results in 20 Seconds</h4>
+                    <p>Our parallel AI agents work simultaneously to deliver your complete fraud report in under 20 seconds.</p>
+                </div>
+            </div>
+
+            <!-- Part D: AI Showcase -->
+            <div class="ai-showcase animate-on-scroll">
+                <div class="ai-left">
+                    <div class="hiw-pill">🤖 Powered by Groq AI</div>
+                    <h3>Your Personal Bill<br>Fraud Detective</h3>
+                    <ul class="ai-checks">
+                        <li><span>✓</span> Ask in English or Hindi</li>
+                        <li><span>✓</span> Get location-specific prices</li>
+                        <li><span>✓</span> Learn how to dispute charges</li>
+                        <li><span>✓</span> Understand CGHS & IRDAI rates</li>
+                        <li><span>✓</span> Get step-by-step dispute guide</li>
+                    </ul>
+                </div>
+                <div class="ai-right">
+                    <div class="mock-chat">
+                        <div class="mock-msg ai">
+                            <div class="mock-avatar">🤖</div>
+                            <div>
+                                <div class="mock-bubble">I've analyzed your bill. You were charged ₹2,800 for a Blood CBC test. The CGHS rate is ₹150 and max private rate is ₹500. This is a 460% overcharge. 🚨</div>
+                                <div class="mock-time">2:34 PM</div>
+                            </div>
+                        </div>
+                        <div class="mock-msg user">
+                            <div class="mock-avatar">👤</div>
+                            <div>
+                                <div class="mock-bubble">I am in Jaipur, is this still overcharged?</div>
+                                <div class="mock-time">2:35 PM</div>
+                            </div>
+                        </div>
+                        <div class="mock-msg ai">
+                            <div class="mock-avatar">🤖</div>
+                            <div>
+                                <div class="mock-bubble">Yes! In Jaipur, fair price for Blood CBC is ₹200-₹400. You were billed ₹2,800 — that's 7x the local rate. I recommend disputing this with your insurer. Shall I draft the dispute letter?</div>
+                                <div class="mock-time">2:35 PM</div>
+                            </div>
+                        </div>
+                        <div class="mock-msg user">
+                            <div class="mock-avatar">👤</div>
+                            <div>
+                                <div class="mock-bubble">Yes please!</div>
+                                <div class="mock-time">2:36 PM</div>
+                            </div>
+                        </div>
+                        <div class="mock-msg ai">
+                            <div class="mock-avatar">🤖</div>
+                            <div>
+                                <div class="typing-dots"><span></span><span></span><span></span></div>
+                                <div class="mock-time">typing...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part E: Stats Bar -->
+            <div class="stats-bar animate-on-scroll">
+                <div class="stat-item">
+                    <div class="stat-value">20 sec</div>
+                    <div class="stat-label">Average analysis time</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">8 agents</div>
+                    <div class="stat-label">AI agents working in parallel</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">₹8,000 Cr</div>
+                    <div class="stat-label">Lost to billing fraud yearly</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Free to use</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Wrapper (To hide and show results) -->
+    <div id="main-content">
+        <!-- 3. Data & Problem Sections -->
+        <section id="data-section">
+            <div class="container">
+                <div class="section-header fade-up">
+                    <h2 class="section-title">Why MedTrace?...</h2>
+                    <p style="color: var(--text-muted); font-size: 1.125rem;">Uncovering the reality of healthcare billing in India.</p>
+                </div>
+                <div class="data-grid">
+                    <div class="data-card fade-up">
+                        <div class="data-number">₹<span class="counter" data-target="10000">0</span> Crore</div>
+                        <div class="data-label">Lost Automatically</div>
+                        <div class="data-desc">India loses this amount annually to hospital billing fraud, hidden markups, and aggressive overcharging practices.</div>
+                    </div>
+                    <div class="data-card fade-up delay-100">
+                        <div class="data-number">₹<span class="counter" data-target="15400">0</span>+</div>
+                        <div class="data-label">Average Overcharge</div>
+                        <div class="data-desc">Basic medicines and daily consumables are frequently billed at 5x to 10x their actual market cost.</div>
+                    </div>
+                    <div class="data-card fade-up delay-200">
+                        <div class="data-number"><span class="counter-float" data-target="2.5">0.0</span>M+</div>
+                        <div class="data-label">Analyses Performed</div>
+                        <div class="data-desc">The average patient has no reliable way to verify if a ₹2,800 routine blood test is a fair price or a scam.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Data Privacy Section -->
+        <section id="privacy-section">
+            <div class="container privacy-grid">
+                <div class="privacy-left fade-up">
+                    <h2 class="section-title" style="margin-bottom: 2rem;">Your Data is completely secure.</h2>
+                    <ul class="privacy-list">
+                        <li>
+                            <div class="check-icon">✓</div>
+                            <div>
+                                <h4>No files stored</h4>
+                                <p>We instantly delete your uploaded bills post-analysis. Nothing remains on our servers.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="check-icon">✓</div>
+                            <div>
+                                <h4>Anonymous scanning</h4>
+                                <p>PII (Patient Identifiable Information) is automatically scrubbed before any processing begins.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="check-icon">✓</div>
+                            <div>
+                                <h4>Bank-grade security</h4>
+                                <p>All data and transit is encrypted with enterprise-level standard 256-bit AES protection.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="privacy-right fade-up delay-100">
+                    <div class="cert-grid">
+                        <div class="cert-card">
+                            <div class="icon">🏛️</div>
+                            <div class="name">Digital India</div>
+                        </div>
+                        <div class="cert-card">
+                            <div class="icon">📜</div>
+                            <div class="name">ISO 27001</div>
+                        </div>
+                        <div class="cert-card">
+                            <div class="icon">⚕️</div>
+                            <div class="name">HIPAA Compliant</div>
+                        </div>
+                        <div class="cert-card">
+                            <div class="icon">🔐</div>
+                            <div class="name">AES-256</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 5. Results Section (Generated via JS) -->
+    <section id="results-section">
+        <div class="container fade-up">
+            <div class="section-header" style="text-align: left; margin-bottom: 3rem;">
+                <h2 class="section-title">Your Audit Report</h2>
+                <button class="btn-outline" onclick="window.location.reload()" style="margin-top:1rem;">← New Scanning</button>
+            </div>
+
+            <div class="metric-cards">
+                <div class="metric-card">
+                    <div class="metric-title">Total Billed</div>
+                    <div class="metric-value">₹24,650</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Fair Price Estimate</div>
+                    <div class="metric-value">₹5,800</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">You Were Overcharged</div>
+                    <div class="metric-value">₹18,850</div>
+                </div>
+            </div>
+
+            <div class="results-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Item Name</th>
+                            <th>Billed ₹</th>
+                            <th>Fair Price ₹</th>
+                            <th>Overcharge ₹</th>
+                            <th>Confidence</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Blood CBC Test</td>
+                            <td>₹2,800</td>
+                            <td style="color: var(--status-green);">₹400 - ₹800</td>
+                            <td style="color: var(--status-red);">₹2,000</td>
+                            <td>95%</td>
+                            <td><span class="badge red">OVERCHARGED</span></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Consultation - Dr. Rao</td>
+                            <td>₹1,500</td>
+                            <td style="color: var(--status-green);">₹800 - ₹1,500</td>
+                            <td>₹0</td>
+                            <td>15%</td>
+                            <td><span class="badge green">FAIR</span></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Paracetamol 500mg </td>
+                            <td>₹850</td>
+                            <td style="color: var(--status-green);">₹150 - ₹200</td>
+                            <td style="color: var(--status-red);">₹650</td>
+                            <td>92%</td>
+                            <td><span class="badge red">OVERCHARGED</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Dark Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <span class="med">Med</span><span class="trace">Trace</span>
+                    </a>
+                    <p>India's first agentic AI auditor that uncovers hidden markups and fraud in your medical bills.</p>
+                    <div class="social-links">
+                        <a href="#">X</a>
+                        <a href="#">Y</a>
+                        <a href="#">in</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#" onclick="event.preventDefault();document.getElementById('howItWorksSection').scrollIntoView({behavior:'smooth'})">How it works</a></li>
+                        <li><a href="#" onclick="event.preventDefault();openMarketRates()">Market Rates</a></li>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">Pricing</a></li>
+                        <li><a href="#" onclick="event.preventDefault();openFaqModal()">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">Blog</a></li>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">Help Center</a></li>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">API Documentation</a></li>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">Community</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#" onclick="event.preventDefault();openPrivacyModal()">Privacy Policy</a></li>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">Terms of Service</a></li>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">Security</a></li>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#" onclick="event.preventDefault();openAboutModal()">About Us</a></li>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">Careers</a></li>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">Contact</a></li>
+                        <li><a href="#" onclick="event.preventDefault();showToast('Coming Soon! 🚀')">Partners</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div>© 2026 MedTrace. All rights reserved.</div>
+                <div>Disclaimer: AI-estimated ranges are for reference only.</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Market Rates Modal -->
+    <div class="modal-overlay" id="marketRatesModal" onclick="if(event.target===this)this.classList.remove('active')">
+        <div class="modal-card">
+            <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">✕</button>
+            <div class="modal-body">
+                <h2 class="modal-title">📊 Official Indian Medical Price Rates</h2>
+                <p class="modal-subtitle">Based on CGHS 2024 rates and IRDAI approved caps. Use these to verify your hospital bill.</p>
+                <input type="text" class="rates-search" placeholder="Search for a medicine or test..." oninput="filterRates(this.value)">
+                <div class="rate-tabs">
+                    <button class="tab-btn active" onclick="filterTab('all')">All</button>
+                    <button class="tab-btn" onclick="filterTab('medicines')">Medicines</button>
+                    <button class="tab-btn" onclick="filterTab('tests')">Tests</button>
+                    <button class="tab-btn" onclick="filterTab('procedures')">Procedures</button>
+                    <button class="tab-btn" onclick="filterTab('consumables')">Consumables</button>
+                    <button class="tab-btn" onclick="filterTab('rooms')">Room Charges</button>
+                </div>
+                <div style="overflow-x:auto">
+                <table class="rates-table">
+                    <thead><tr><th>Item Name</th><th>CGHS Min</th><th>Private Max</th><th>Your Right</th></tr></thead>
+                    <tbody>
+                        <tr class="rate-row" data-category="medicines"><td>Paracetamol 500mg (strip of 10)</td><td class="price-green">₹15</td><td class="price-orange">₹80</td><td class="price-blue">MRP on package</td></tr>
+                        <tr class="rate-row" data-category="medicines"><td>Amoxicillin 500mg (strip of 10)</td><td class="price-green">₹45</td><td class="price-orange">₹180</td><td class="price-blue">MRP on package</td></tr>
+                        <tr class="rate-row" data-category="medicines"><td>Pantoprazole 40mg (strip of 10)</td><td class="price-green">₹28</td><td class="price-orange">₹120</td><td class="price-blue">MRP on package</td></tr>
+                        <tr class="rate-row" data-category="medicines"><td>Azithromycin 500mg (strip of 3)</td><td class="price-green">₹35</td><td class="price-orange">₹150</td><td class="price-blue">MRP on package</td></tr>
+                        <tr class="rate-row" data-category="medicines"><td>Metformin 500mg (strip of 10)</td><td class="price-green">₹12</td><td class="price-orange">₹60</td><td class="price-blue">MRP on package</td></tr>
+                        <tr class="rate-row" data-category="medicines"><td>Atorvastatin 10mg (strip of 10)</td><td class="price-green">₹18</td><td class="price-orange">₹95</td><td class="price-blue">MRP on package</td></tr>
+                        <tr class="rate-row" data-category="medicines"><td>Cefixime 200mg (strip of 10)</td><td class="price-green">₹85</td><td class="price-orange">₹280</td><td class="price-blue">MRP on package</td></tr>
+                        <tr class="rate-row" data-category="medicines"><td>Dolo 650mg (strip of 10)</td><td class="price-green">₹30</td><td class="price-orange">₹95</td><td class="price-blue">MRP on package</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>Blood CBC (Complete)</td><td class="price-green">₹150</td><td class="price-orange">₹500</td><td class="price-blue">Max ₹500 private</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>Blood Sugar Fasting</td><td class="price-green">₹40</td><td class="price-orange">₹150</td><td class="price-blue">CGHS rate ₹40</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>Urine Routine</td><td class="price-green">₹50</td><td class="price-orange">₹200</td><td class="price-blue">CGHS rate ₹50</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>ECG (12 lead)</td><td class="price-green">₹100</td><td class="price-orange">₹400</td><td class="price-blue">CGHS rate ₹100</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>X-Ray Chest (PA view)</td><td class="price-green">₹100</td><td class="price-orange">₹500</td><td class="price-blue">CGHS rate ₹100</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>Lipid Profile</td><td class="price-green">₹180</td><td class="price-orange">₹600</td><td class="price-blue">CGHS rate ₹180</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>Thyroid TSH</td><td class="price-green">₹180</td><td class="price-orange">₹500</td><td class="price-blue">CGHS rate ₹180</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>HbA1c</td><td class="price-green">₹200</td><td class="price-orange">₹600</td><td class="price-blue">CGHS rate ₹200</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>Liver Function Test</td><td class="price-green">₹250</td><td class="price-orange">₹800</td><td class="price-blue">CGHS rate ₹250</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>Kidney Function Test</td><td class="price-green">₹250</td><td class="price-orange">₹800</td><td class="price-blue">CGHS rate ₹250</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>2D Echo</td><td class="price-green">₹900</td><td class="price-orange">₹3,500</td><td class="price-blue">CGHS rate ₹900</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>CT Scan Head</td><td class="price-green">₹1,800</td><td class="price-orange">₹5,000</td><td class="price-blue">CGHS rate ₹1,800</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>MRI Brain</td><td class="price-green">₹3,500</td><td class="price-orange">₹8,000</td><td class="price-blue">CGHS rate ₹3,500</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>Dengue NS1 Antigen</td><td class="price-green">₹600</td><td class="price-orange">₹1,500</td><td class="price-blue">CGHS rate ₹600</td></tr>
+                        <tr class="rate-row" data-category="tests"><td>COVID RT-PCR</td><td class="price-green">₹300</td><td class="price-orange">₹800</td><td class="price-blue">ICMR cap ₹800</td></tr>
+                        <tr class="rate-row" data-category="procedures"><td>Doctor Consultation (General)</td><td class="price-green">₹200</td><td class="price-orange">₹800</td><td class="price-blue">Reasonable</td></tr>
+                        <tr class="rate-row" data-category="procedures"><td>Specialist Consultation</td><td class="price-green">₹400</td><td class="price-orange">₹1,500</td><td class="price-blue">Reasonable</td></tr>
+                        <tr class="rate-row" data-category="procedures"><td>Emergency Consultation</td><td class="price-green">₹500</td><td class="price-orange">₹2,000</td><td class="price-blue">Reasonable</td></tr>
+                        <tr class="rate-row" data-category="procedures"><td>Dressing (Simple)</td><td class="price-green">₹50</td><td class="price-orange">₹200</td><td class="price-blue">CGHS rate</td></tr>
+                        <tr class="rate-row" data-category="procedures"><td>Dressing (Complex)</td><td class="price-green">₹150</td><td class="price-orange">₹500</td><td class="price-blue">CGHS rate</td></tr>
+                        <tr class="rate-row" data-category="procedures"><td>Injection (IV)</td><td class="price-green">₹50</td><td class="price-orange">₹200</td><td class="price-blue">Per injection</td></tr>
+                        <tr class="rate-row" data-category="procedures"><td>Nebulization</td><td class="price-green">₹100</td><td class="price-orange">₹300</td><td class="price-blue">Per session</td></tr>
+                        <tr class="rate-row" data-category="procedures"><td>Suturing (Simple)</td><td class="price-green">₹200</td><td class="price-orange">₹800</td><td class="price-blue">CGHS rate</td></tr>
+                        <tr class="rate-row" data-category="consumables"><td>Surgical Gloves (pair)</td><td class="price-green">₹10</td><td class="price-orange">₹40</td><td class="price-blue">MRP on pack</td></tr>
+                        <tr class="rate-row" data-category="consumables"><td>Saline IV 500ml</td><td class="price-green">₹40</td><td class="price-orange">₹150</td><td class="price-blue">MRP on bottle</td></tr>
+                        <tr class="rate-row" data-category="consumables"><td>Syringe 5ml</td><td class="price-green">₹3</td><td class="price-orange">₹15</td><td class="price-blue">MRP on pack</td></tr>
+                        <tr class="rate-row" data-category="consumables"><td>IV Cannula</td><td class="price-green">₹15</td><td class="price-orange">₹60</td><td class="price-blue">MRP on pack</td></tr>
+                        <tr class="rate-row" data-category="consumables"><td>Bandage Roll</td><td class="price-green">₹15</td><td class="price-orange">₹60</td><td class="price-blue">MRP on pack</td></tr>
+                        <tr class="rate-row" data-category="consumables"><td>Cotton Roll 100g</td><td class="price-green">₹20</td><td class="price-orange">₹80</td><td class="price-blue">MRP on pack</td></tr>
+                        <tr class="rate-row" data-category="consumables"><td>Urine Bag</td><td class="price-green">₹20</td><td class="price-orange">₹80</td><td class="price-blue">MRP on pack</td></tr>
+                        <tr class="rate-row" data-category="consumables"><td>Oxygen Mask</td><td class="price-green">₹30</td><td class="price-orange">₹120</td><td class="price-blue">MRP on pack</td></tr>
+                        <tr class="rate-row" data-category="consumables"><td>Nebulizer Mask</td><td class="price-green">₹25</td><td class="price-orange">₹100</td><td class="price-blue">MRP on pack</td></tr>
+                        <tr class="rate-row" data-category="rooms"><td>General Ward (per day)</td><td class="price-green">₹500</td><td class="price-orange">₹3,000</td><td class="price-blue">Varies by hospital</td></tr>
+                        <tr class="rate-row" data-category="rooms"><td>Semi-Private Room</td><td class="price-green">₹1,000</td><td class="price-orange">₹6,000</td><td class="price-blue">Varies by hospital</td></tr>
+                        <tr class="rate-row" data-category="rooms"><td>Private Room</td><td class="price-green">₹2,000</td><td class="price-orange">₹12,000</td><td class="price-blue">Varies by hospital</td></tr>
+                        <tr class="rate-row" data-category="rooms"><td>ICU (per day)</td><td class="price-green">₹2,500</td><td class="price-orange">₹15,000</td><td class="price-blue">CGHS rate ₹2,500</td></tr>
+                        <tr class="rate-row" data-category="rooms"><td>NICU (per day)</td><td class="price-green">₹3,000</td><td class="price-orange">₹18,000</td><td class="price-blue">CGHS rate ₹3,000</td></tr>
+                    </tbody>
+                </table>
+                </div>
+                <p class="rates-source">📌 Source: CGHS Rate List 2024, IRDAI Health Insurance Guidelines, Jan Aushadhi Price List</p>
+                <div class="rates-tip">💡 Tip: If your hospital charged more than the Private Max column, you may be entitled to a refund through your insurance provider.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div class="modal-overlay" id="supportModal" onclick="if(event.target===this)this.classList.remove('active')">
+        <div class="modal-card support-card">
+            <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">✕</button>
+            <div class="modal-body">
+                <h2 class="modal-title">🛟 Get Support</h2>
+                <p class="modal-subtitle">We're here to help you fight billing fraud</p>
+                <div class="support-option" onclick="this.closest('.modal-overlay').classList.remove('active');document.getElementById('hero-section').scrollIntoView({behavior:'smooth'})">
+                    <div class="support-option-icon">💬</div>
+                    <div><h4>Chat with AI</h4><p>Ask our AI assistant about your bill</p></div>
+                </div>
+                <div class="support-option" onclick="window.location.href='mailto:medtrace.support@gmail.com'">
+                    <div class="support-option-icon">📧</div>
+                    <div><h4>Email Support</h4><p>medtrace.support@gmail.com</p></div>
+                </div>
+                <div class="support-option" onclick="window.open('https://bimabharosa.irdai.gov.in')">
+                    <div class="support-option-icon">🏛️</div>
+                    <div><h4>File IRDAI Complaint</h4><p>Official insurance grievance portal</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beta Modal -->
+    <div class="modal-overlay" id="betaModal" onclick="if(event.target===this)this.classList.remove('active')">
+        <div class="modal-card beta-modal-card">
+            <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">✕</button>
+            <div id="betaForm">
+                <div style="font-size:3rem;margin-bottom:1rem">🛡️</div>
+                <h2 class="modal-title">Join <span id="betaCountDisplay">2,547</span> Indians Already Protected</h2>
+                <p class="modal-subtitle">Get early access and help us fight hospital billing fraud</p>
+                <div class="beta-count-pill">🔥 47 people joined this week</div>
+                <input type="email" id="betaEmail" class="beta-email" placeholder="your@email.com">
+                <button class="beta-submit" onclick="joinBeta()">Join the Beta →</button>
+                <p style="color:var(--text-muted);font-size:0.75rem;margin-top:1rem">🔒 No spam. Unsubscribe anytime.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Modal -->
+    <div class="modal-overlay" id="faqModal" onclick="if(event.target===this)this.classList.remove('active')">
+        <div class="modal-card" style="max-width:600px">
+            <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">✕</button>
+            <div class="modal-body">
+                <h2 class="modal-title">❓ Frequently Asked Questions</h2>
+                <p class="modal-subtitle">Everything you need to know about MedTrace</p>
+                <div class="faq-item"><div class="faq-q">Q: Is MedTrace really free?</div><div class="faq-a">Yes! MedTrace is completely free to use. We believe every Indian deserves to know if they're being overcharged for healthcare.</div></div>
+                <div class="faq-item"><div class="faq-q">Q: How accurate are the price estimates?</div><div class="faq-a">Our AI uses official CGHS 2024 rates, IRDAI approved caps, and Jan Aushadhi prices. We show ranges instead of single prices for better accuracy across different cities and hospital types.</div></div>
+                <div class="faq-item"><div class="faq-q">Q: Is my medical bill data safe?</div><div class="faq-a">Absolutely. Your bill is processed in real-time and immediately deleted. We never store any patient data on our servers. All processing is encrypted end-to-end.</div></div>
+                <div class="faq-item"><div class="faq-q">Q: Can I use this to dispute a bill?</div><div class="faq-a">Yes! Our AI generates a detailed fraud report with exact overcharge amounts and CGHS/IRDAI references that you can use when disputing with your hospital or insurance provider.</div></div>
+                <div class="faq-item" style="border-bottom:none"><div class="faq-q">Q: What formats are supported?</div><div class="faq-a">We support JPG, PNG, and PDF files. You can also take a photo directly from your phone's camera.</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal-overlay" id="privacyModal" onclick="if(event.target===this)this.classList.remove('active')">
+        <div class="modal-card" style="max-width:600px">
+            <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">✕</button>
+            <div class="modal-body">
+                <h2 class="modal-title">🔒 Privacy Policy</h2>
+                <p class="modal-subtitle">Your privacy is our top priority</p>
+                <div class="faq-item"><div class="faq-q">Data Collection</div><div class="faq-a">We only process the medical bill image you upload. No personal information is collected or stored.</div></div>
+                <div class="faq-item"><div class="faq-q">Data Processing</div><div class="faq-a">Your bill is analyzed using AI in real-time. The image and extracted data are immediately deleted after analysis is complete.</div></div>
+                <div class="faq-item"><div class="faq-q">Data Storage</div><div class="faq-a">We do not store any user data, medical records, or bill images on our servers. All analysis results exist only in your browser session.</div></div>
+                <div class="faq-item"><div class="faq-q">Third-Party Sharing</div><div class="faq-a">We never share, sell, or transfer any user data to third parties. Your medical and financial information stays with you.</div></div>
+                <div class="faq-item" style="border-bottom:none"><div class="faq-q">Encryption</div><div class="faq-a">All data transmission is protected with 256-bit AES encryption and SSL/TLS protocols, the same security used by major banks.</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal-overlay" id="aboutModal" onclick="if(event.target===this)this.classList.remove('active')">
+        <div class="modal-card" style="max-width:600px">
+            <button class="modal-close" onclick="this.closest('.modal-overlay').classList.remove('active')">✕</button>
+            <div class="modal-body">
+                <h2 class="modal-title">🏥 About MedTrace</h2>
+                <p class="modal-subtitle">India's first agentic AI auditor for hospital bills</p>
+                <div class="faq-item"><div class="faq-q">Our Mission</div><div class="faq-a">To empower every Indian with the tools to detect and fight hospital billing fraud. Indians lose over ₹10,000 Crore annually to healthcare overcharging — we're here to stop that.</div></div>
+                <div class="faq-item"><div class="faq-q">How It Works</div><div class="faq-a">MedTrace uses a chain of 8 specialised AI agents powered by Google Gemini and Groq to analyse every line item on your bill against official CGHS rates, IRDAI caps, and real-time market prices.</div></div>
+                <div class="faq-item" style="border-bottom:none"><div class="faq-q">Technology</div><div class="faq-a">Built with Gemini Vision AI for OCR, Groq-powered LLMs for chat, and a multi-agent architecture that delivers results in under 20 seconds.</div></div>
+            </div>
+        </div>
     </div>
 
     <script>
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-        const previewContainer = document.getElementById('preview-container');
-        const imagePreview = document.getElementById('image-preview');
-        const filenameDisplay = document.getElementById('filename');
-        const analyzeBtn = document.getElementById('analyze-btn');
-        const errorBox = document.getElementById('error-box');
-        const loadingSteps = document.getElementById('loading-steps');
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const step3 = document.getElementById('step3');
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Navbar Scroll Effect ---
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if(window.scrollY > 20) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
 
-        let selectedFile = null;
+            // --- Scroll Animation Observer ---
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
 
-        // Drag and Drop Handlers
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        
+                        if (entry.target.querySelector('.counter')) {
+                            const counters = entry.target.querySelectorAll('.counter');
+                            counters.forEach(counter => {
+                                if(!counter.hasAttribute('data-animated')) {
+                                    animateValue(counter, 0, parseInt(counter.getAttribute('data-target')), 2000);
+                                    counter.setAttribute('data-animated', 'true');
+                                }
+                            });
+                        }
+                        if (entry.target.querySelector('.counter-float')) {
+                            const counters = entry.target.querySelectorAll('.counter-float');
+                            counters.forEach(counter => {
+                                if(!counter.hasAttribute('data-animated')) {
+                                    animateFloatValue(counter, 0.0, parseFloat(counter.getAttribute('data-target')), 2000);
+                                    counter.setAttribute('data-animated', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-up').forEach(el => {
+                observer.observe(el);
+            });
+
+            function animateValue(obj, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+
+            function animateFloatValue(obj, start, end, duration) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    obj.innerHTML = (progress * (end - start) + start).toFixed(1);
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+
+            // --- File Input Change Handler ---
+            // --- Handlers: File Input & Drag and Drop ---
+            const fileInput = document.getElementById('fileInput');
+            const dropZone = document.getElementById('drop-zone');
+
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) window.handleFileSelected(e.target.files[0]);
+                });
+            }
+
+            if (dropZone) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, preventDefaults, false);
+                });
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, () => dropZone.style.borderColor = 'var(--brand-blue)', false);
+                });
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, () => dropZone.style.borderColor = 'var(--border-color)', false);
+                });
+                dropZone.addEventListener('drop', (e) => {
+                    let dt = e.dataTransfer;
+                    let files = dt.files;
+                    if (files.length > 0) window.handleFileSelected(files[0]);
+                });
+            }
         });
 
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        // --- File Selected Handler ---
+        function showPreview(dataUrl, fileName) {
+            document.getElementById('fileName').textContent = '📎 ' + fileName;
+            document.getElementById('fileName').style.display = 'block';
+            document.getElementById('analyzeBtn').style.display = 'block';
+            document.getElementById('uploadLabel').textContent = 'File Selected!';
+            document.getElementById('uploadSubLabel').textContent = 'Click "Analyze Bill" below to start.';
         }
 
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => {
-                dropZone.style.backgroundColor = 'rgba(26, 32, 53, 0.8)';
-            }, false);
-        });
+        window.handleFileSelected = function(file) {
+            if (!file) return;
+            if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
+                showError('Please select a valid image (JPG or PNG)');
+                return;
+            }
+            
+            // Save file globally
+            window.selectedFile = file;
+            console.log('File selected:', file.name);
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                showPreview(e.target.result, file.name);
+            };
+            reader.readAsDataURL(file);
+        };
 
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => {
-                dropZone.style.backgroundColor = 'var(--card-bg)';
-            }, false);
-        });
+        // --- Analyze Bill: Fixed Backend Call ---
+        async function analyzeBill() {
+            const fileInput = document.getElementById('fileInput')
+            
+            // Check multiple ways to get the file
+            let file = null
+            
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+                file = fileInput.files[0]
+            } else if (window.selectedFile) {
+                file = window.selectedFile
+            }
+            
+            if (!file) {
+                alert('Please select a bill image first')
+                return
+            }
 
-        dropZone.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
-        });
+            // Show progress
+            showProgress()
 
-        fileInput.addEventListener('change', function() {
-            handleFiles(this.files);
-        });
+            try {
+                const formData = new FormData()
+                formData.append('file', file)
+                
+                console.log('Sending file:', file.name, file.size)
+                console.log('Sending to: http://localhost:8000/api/analyze-bill')
 
-        function handleFiles(files) {
-            if (files.length > 0) {
-                selectedFile = files[0];
-                if (!selectedFile.type.match('image.*')) {
-                    showError("Please upload an image file (JPG or PNG).");
-                    return;
+                // Step 1 animation
+                setStep(1);
+
+                const response = await fetch(
+                    'http://localhost:8000/api/analyze-bill', 
+                    {
+                        method: 'POST',
+                        body: formData,
+                        // Do NOT set Content-Type header
+                        // Browser sets it automatically with boundary
+                    }
+                )
+                
+                console.log('Response status:', response.status)
+
+                // Step 2 animation  
+                setStep(2);
+                await sleep(500);
+
+                if (!response.ok) {
+                    let errorMsg = 'Server error: ' + response.status
+                    try {
+                        const errData = await response.json()
+                        errorMsg = errData.detail || errorMsg
+                    } catch(e) {}
+                    throw new Error(errorMsg)
+                }
+
+                const data = await response.json()
+                console.log('Received data:', data)
+                
+                // Step 3 animation
+                setStep(3);
+                await sleep(500);
+
+                if (!data || !data.all_items) {
+                    throw new Error('Invalid response from server. Try again.')
+                }
+
+                // Save to localStorage
+                localStorage.setItem('billResult', JSON.stringify(data))
+                console.log('Saved to localStorage successfully')
+                
+                // Redirect to results
+                setTimeout(() => {
+                    window.location.href = 'results.html'
+                }, 800)
+
+            } catch (error) {
+                console.error('Fetch error:', error)
+                hideProgress()
+                
+                // Show specific error messages
+                let userMessage = error.message
+                
+                if (error.message.includes('Failed to fetch') || 
+                    error.message.includes('NetworkError') ||
+                    error.message.includes('ERR_CONNECTION_REFUSED')) {
+                    userMessage = '❌ Cannot connect to backend. Please make sure you ran: python -m uvicorn main:app --reload --port 8000'
                 }
                 
-                errorBox.style.display = 'none';
-                filenameDisplay.textContent = selectedFile.name;
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    imagePreview.src = e.target.result;
-                    dropZone.style.display = 'none';
-                    previewContainer.style.display = 'flex';
-                }
-                reader.readAsDataURL(selectedFile);
+                showError(userMessage)
             }
         }
 
-        function showError(msg) {
-            errorBox.textContent = msg;
-            errorBox.style.display = 'block';
-        }
-
-        async function sleep(ms) {
+        function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        analyzeBtn.addEventListener('click', async () => {
-            if (!selectedFile) return;
+        function setStep(n) {
+            document.querySelectorAll('.step').forEach((el, i) => {
+                if (i < n) {
+                    el.classList.add('active');
+                    el.classList.remove('pending');
+                    el.style.color = 'var(--brand-blue)';
+                    el.querySelector('span').textContent = '✅';
+                }
+            });
+        }
 
-            // UI Changes
-            analyzeBtn.style.display = 'none';
-            errorBox.style.display = 'none';
-            loadingSteps.style.display = 'block';
+        function showProgress() {
+            document.getElementById('analyzeBtn').disabled = true;
+            document.getElementById('analyzeBtn').textContent = 'Analyzing...';
+            document.getElementById('progressOverlay').style.display = 'block';
+            document.getElementById('errorToast').style.display = 'none';
+        }
 
-            // Fake progress animation while actual request happens
-            step1.classList.add('active', 'loading');
-            
-            const formData = new FormData();
-            formData.append('file', selectedFile);
+        function hideProgress() {
+            document.getElementById('analyzeBtn').disabled = false;
+            document.getElementById('analyzeBtn').textContent = 'Analyze Bill →';
+            document.getElementById('progressOverlay').style.display = 'none';
+            // Reset steps
+            document.querySelectorAll('.step').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('pending');
+                el.style.color = 'var(--text-muted)';
+                el.querySelector('span').textContent = '⏳';
+            });
+        }
+
+        function showError(msg) {
+            const toast = document.getElementById('errorToast');
+            toast.textContent = '⚠️ ' + msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 7000);
+        }
+
+        // --- Camera Functions ---
+        let cameraStream = null;
+
+        async function openCamera() {
+            const modal = document.getElementById('cameraModal');
+            const video = document.getElementById('cameraVideo');
+            const placeholder = document.getElementById('cameraPlaceholder');
+            const captureBtn = document.getElementById('captureBtn');
+            const hint = document.getElementById('cameraHint');
+
+            // Reset state
+            document.getElementById('capturedPreview').style.display = 'none';
+            document.getElementById('retakeBtn').style.display = 'none';
+            document.getElementById('usePhotoBtn').style.display = 'none';
+            captureBtn.style.display = 'flex';
+            captureBtn.disabled = true;
+            video.style.display = 'block';
+            placeholder.classList.remove('hidden');
+            placeholder.querySelector('p').textContent = 'Requesting camera permission...';
+            hint.textContent = 'Position your bill within the frame and tap capture';
+
+            // Show modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
 
             try {
-                // To keep the UI animations running, we don't await the fetch immediately,
-                // or we use Promise.all to ensure AT LEAST 6 seconds pass for the animations.
-                
-                const apiPromise = fetch('http://localhost:8000/api/analyze-bill', {
-                    method: 'POST',
-                    body: formData
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
+                    audio: false
                 });
+                video.srcObject = cameraStream;
+                await video.play();
 
-                await sleep(2000); // Minimum 2s for Step 1
-                step1.classList.remove('loading');
-                step1.classList.add('done');
-                step1.innerHTML = '<span>✅ Reading your bill with Gemini Vision...</span>';
-                
-                step2.classList.add('active', 'loading');
-                await sleep(2000); // Minimum 2s for Step 2
-                step2.classList.remove('loading');
-                step2.classList.add('done');
-                step2.innerHTML = '<span>✅ Researching market prices...</span>';
-                
-                step3.classList.add('active', 'loading');
-                
-                const response = await apiPromise;
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.detail || 'Analysis failed.');
-                }
-
-                await sleep(2000); // Just holding on step 3 for a bit
-                step3.classList.remove('loading');
-                step3.classList.add('done');
-                step3.innerHTML = '<span>✅ Generating fraud report...</span>';
-
-                localStorage.setItem("billResult", JSON.stringify(data));
-                window.location.href = "results.html";
-
+                // Hide placeholder, enable capture
+                placeholder.classList.add('hidden');
+                captureBtn.disabled = false;
             } catch (err) {
-                step3.classList.remove('loading');
-                showError("Error: " + err.message);
-                analyzeBtn.style.display = 'block'; // Allow retry
+                console.error('Camera error:', err);
+                placeholder.querySelector('.camera-placeholder-icon').textContent = '🚫';
+                if (err.name === 'NotAllowedError') {
+                    placeholder.querySelector('p').textContent = 'Camera permission denied. Please allow camera access and try again.';
+                } else if (err.name === 'NotFoundError') {
+                    placeholder.querySelector('p').textContent = 'No camera found on this device.';
+                } else {
+                    placeholder.querySelector('p').textContent = 'Could not access camera: ' + err.message;
+                }
+                hint.textContent = 'Close this dialog and try uploading a file instead';
+            }
+        }
+
+        function closeCamera() {
+            const modal = document.getElementById('cameraModal');
+            const video = document.getElementById('cameraVideo');
+
+            // Stop all tracks
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            video.srcObject = null;
+
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            const preview = document.getElementById('capturedPreview');
+
+            // Draw video frame to canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            // Show captured preview
+            preview.src = canvas.toDataURL('image/jpeg', 0.92);
+            preview.style.display = 'block';
+            video.style.display = 'none';
+
+            // Toggle buttons
+            document.getElementById('captureBtn').style.display = 'none';
+            document.getElementById('retakeBtn').style.display = 'inline-flex';
+            document.getElementById('usePhotoBtn').style.display = 'inline-flex';
+            document.getElementById('cameraHint').textContent = 'Happy with the photo? Tap "Use This Photo" to analyze it';
+        }
+
+        function retakePhoto() {
+            const video = document.getElementById('cameraVideo');
+            const preview = document.getElementById('capturedPreview');
+
+            preview.style.display = 'none';
+            video.style.display = 'block';
+
+            document.getElementById('captureBtn').style.display = 'flex';
+            document.getElementById('retakeBtn').style.display = 'none';
+            document.getElementById('usePhotoBtn').style.display = 'none';
+            document.getElementById('cameraHint').textContent = 'Position your bill within the frame and tap capture';
+        }
+
+        function usePhoto() {
+            const canvas = document.getElementById('cameraCanvas');
+
+            canvas.toBlob((blob) => {
+                const fileName = 'bill_photo_' + Date.now() + '.jpg';
+                const file = new File([blob], fileName, { type: 'image/jpeg' });
+
+                // Feed into the main file input
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                document.getElementById('fileInput').files = dt.files;
+
+                // Trigger the same UI flow
+                handleFileSelected(file);
+
+                // Close camera
+                closeCamera();
+            }, 'image/jpeg', 0.92);
+        }
+
+        // ===== MODAL FUNCTIONS =====
+        function openMarketRates() { document.getElementById('marketRatesModal').classList.add('active'); }
+        function openSupport() { document.getElementById('supportModal').classList.add('active'); }
+        function openBetaModal() {
+            const count = parseInt(localStorage.getItem('betaCount') || '2547');
+            document.getElementById('betaCountDisplay').textContent = count.toLocaleString('en-IN');
+            document.getElementById('betaModal').classList.add('active');
+        }
+        function openFaqModal() { document.getElementById('faqModal').classList.add('active'); }
+        function openPrivacyModal() { document.getElementById('privacyModal').classList.add('active'); }
+        function openAboutModal() { document.getElementById('aboutModal').classList.add('active'); }
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+                const langMenu = document.getElementById('langMenu');
+                if (langMenu) langMenu.classList.remove('show');
             }
         });
+
+        // ===== TOAST =====
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:white;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:500;z-index:99999;animation:slideUp 0.3s ease;box-shadow:0 10px 25px rgba(0,0,0,0.2);font-family:var(--font-body);';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ===== MARKET RATES FILTER =====
+        function filterRates(query) {
+            const rows = document.querySelectorAll('.rate-row');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+            });
+        }
+        function filterTab(category) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            const rows = document.querySelectorAll('.rate-row');
+            rows.forEach(row => {
+                if (category === 'all') {
+                    row.style.display = '';
+                } else {
+                    row.style.display = row.dataset.category === category ? '' : 'none';
+                }
+            });
+        }
+
+        // ===== BETA SIGNUP =====
+        function joinBeta() {
+            const email = document.getElementById('betaEmail').value;
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email');
+                return;
+            }
+            let count = parseInt(localStorage.getItem('betaCount') || '2547');
+            count++;
+            localStorage.setItem('betaCount', count.toString());
+            document.getElementById('betaForm').innerHTML = '<div style="text-align:center;padding:20px"><div style="font-size:48px;margin-bottom:16px">🎉</div><h3 style="color:#1e293b;font-size:20px;margin-bottom:8px;font-family:var(--font-heading)">You\'re on the list!</h3><p style="color:#64748b;font-size:14px">You are member #' + count.toLocaleString('en-IN') + '. We\'ll be in touch soon.</p></div>';
+        }
+
+        // ===== LANGUAGE SWITCHER =====
+        function toggleLangMenu() {
+            document.getElementById('langMenu').classList.toggle('show');
+        }
+        // Close dropdown on outside click
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.lang-dropdown')) {
+                const langMenu = document.getElementById('langMenu');
+                if (langMenu) langMenu.classList.remove('show');
+            }
+        });
+
+        const langTexts = {
+            en: {
+                heroTitle: 'Protecting Your <span>Health</span> & Your <span>Wallet</span>',
+                heroDesc: 'Upload your medical bill to instantly detect fraud, find fair market prices, and see exactly where you were overcharged.',
+                uploadTitle: 'Upload Hospital Bill',
+                browseBtn: 'Browse Files',
+                scanBtn: 'Start Scanning',
+                langName: 'English'
+            },
+            hi: {
+                heroTitle: 'अपनी <span>सेहत</span> और अपने <span>पैसे</span> की रक्षा करें',
+                heroDesc: 'अपना अस्पताल का बिल अपलोड करें और तुरंत पता करें कहाँ धोखा हुआ',
+                uploadTitle: 'अस्पताल का बिल अपलोड करें',
+                browseBtn: 'फ़ाइल चुनें',
+                scanBtn: 'स्कैन शुरू करें',
+                langName: 'हिन्दी'
+            },
+            ta: {
+                heroTitle: 'உங்கள் <span>உடல்நலம்</span> மற்றும் <span>பணத்தை</span> பாதுகாங்கள்',
+                heroDesc: 'மருத்துவமனை மசோதாவை பதிவேற்றி மோசடியை கண்டறியுங்கள்',
+                uploadTitle: 'மருத்துவமனை பில் பதிவேற்றவும்',
+                browseBtn: 'கோப்பை தேர்ந்தெடு',
+                scanBtn: 'ஸ்கேன் தொடங்கு',
+                langName: 'தமிழ்'
+            }
+        };
+
+        function switchLang(lang) {
+            const t = langTexts[lang];
+            document.body.style.opacity = '0.4';
+            document.body.style.transition = 'opacity 0.3s';
+            setTimeout(() => {
+                document.querySelector('.hero-title').innerHTML = t.heroTitle;
+                document.querySelector('.hero-desc').textContent = t.heroDesc;
+                document.getElementById('uploadLabel').textContent = t.uploadTitle;
+                const browseBtn = document.querySelector('.dropzone .btn-outline');
+                if (browseBtn) browseBtn.textContent = t.browseBtn;
+                const scanBtn = document.querySelector('.hero-ctas .btn-primary');
+                if (scanBtn) scanBtn.textContent = t.scanBtn;
+                document.getElementById('currentLang').textContent = t.langName;
+                document.getElementById('langMenu').classList.remove('show');
+                document.body.style.opacity = '1';
+            }, 300);
+        }
+
+        // ===== SCROLL ANIMATIONS =====
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            scrollObserver.observe(el);
+        });
+
+        // ===== UPLOAD CARD ANIMATION =====
+        function openUploadCard() {
+            const card = document.getElementById('uploadCard');
+            
+            if (card.classList.contains('open')) {
+                card.classList.remove('open');
+                document.getElementById('scanBtn').innerHTML = 'Start Scanning';
+            } else {
+                card.classList.add('open');
+                document.getElementById('scanBtn').innerHTML = '✕ Close';
+            }
+        }
     </script>
 </body>
 </html>
