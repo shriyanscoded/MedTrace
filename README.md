@@ -17,6 +17,7 @@
 ![MedTrace UI](Home.png)
 ![MedTrace UI](Analyzing.png)
 ![MedTrace UI](Report.png)
+![MedTrace UI](AIAssistant.png)
 
 
 ---
